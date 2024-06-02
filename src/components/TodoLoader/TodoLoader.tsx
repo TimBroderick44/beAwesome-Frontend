@@ -1,8 +1,22 @@
 import { useEffect, useState } from "react";
-import { useSensor, useSensors, MouseSensor, TouchSensor, DragEndEvent, DndContext, DragStartEvent, DragOverlay } from '@dnd-kit/core';
+import {
+  useSensor,
+  useSensors,
+  MouseSensor,
+  TouchSensor,
+  DragEndEvent,
+  DndContext,
+  DragStartEvent,
+  DragOverlay,
+} from "@dnd-kit/core";
 import TodoGrid from "../TodoGrid/TodoGrid";
 import Flexbox from "../../containers/Flexbox/Flexbox.tsx";
-import { fetchTodos, deleteTodo, updateTodo, createTodo } from "../../services/todo-services";
+import {
+  fetchTodos,
+  deleteTodo,
+  updateTodo,
+  createTodo,
+} from "../../services/todo-services";
 import { arrayMove } from "@dnd-kit/sortable";
 import { TodoType } from "../../types/todo.tsx";
 import { toast } from "react-toastify";
@@ -16,9 +30,10 @@ const TodoLoader: React.FC = () => {
   useEffect(() => {
     const loadTodos = async () => {
       try {
-        const incompletedData = await fetchTodos(false);
-        const completedData = await fetchTodos(true);
-        setTodos([...incompletedData, ...completedData].map(todo => ({ ...todo, isEditing: false })));
+        const allTodos = await fetchTodos();
+        setTodos(
+          allTodos.map((todo: TodoType) => ({ ...todo, isEditing: false }))
+        );
       } catch (error) {
         if (error instanceof Error) {
           toast.error(error.message);
@@ -54,12 +69,12 @@ const TodoLoader: React.FC = () => {
       isFirstEdit: true,
       isEditing: true,
       completed: false,
-      position: todos.filter(todo => !todo.completed).length + 1
+      position: todos.filter((todo) => !todo.completed).length + 1,
     };
     setTodos([...todos, newTodo]);
   };
 
-  const handleSave = async (tempId: number, newTodo: Omit<TodoType, 'id'>) => {
+  const handleSave = async (tempId: number, newTodo: Omit<TodoType, "id">) => {
     if (!newTodo.title.trim()) {
       toast.error("You at least need a title!");
       return;
@@ -69,10 +84,12 @@ const TodoLoader: React.FC = () => {
       const data = await createTodo(newTodo);
       setTodos((prevTodos) =>
         prevTodos.map((todo) =>
-          todo.id === tempId ? { ...data, isFirstEdit: false, isEditing: false } : todo
+          todo.id === tempId
+            ? { ...data, isFirstEdit: false, isEditing: false }
+            : todo
         )
       );
-      toast.success("New goal created! Now, let's get it done!");
+      toast.success("Let's get it done!");
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -82,38 +99,55 @@ const TodoLoader: React.FC = () => {
     }
   };
 
-  const handleUpdate = async (id: number, newTitle: string, newContent: string, completed: boolean, position: number) => {
+  const handleUpdate = async (
+    id: number,
+    newTitle: string,
+    newContent: string,
+    completed: boolean,
+    position: number
+  ) => {
     if (!newTitle.trim()) {
       toast.error("You at least need a title!");
       return;
     }
 
-    const todo = todos.find(todo => todo.id === id);
+    const todo = todos.find((todo) => todo.id === id);
     if (!todo) {
       toast.error("Todo not found");
       return;
     }
 
-    if (newTitle === todo.title && newContent === todo.content && completed === todo.completed && position === todo.position) {
+    if (
+      newTitle === todo.title &&
+      newContent === todo.content &&
+      completed === todo.completed &&
+      position === todo.position
+    ) {
       toast.info("No changes were made.");
       return;
     }
 
     try {
-      const updatedTodo = { ...todo, title: newTitle, content: newContent, completed, position };
+      const updatedTodo = {
+        ...todo,
+        title: newTitle,
+        content: newContent,
+        completed,
+        position,
+      };
       await updateTodo({
         id: updatedTodo.id,
         title: updatedTodo.title,
         content: updatedTodo.content,
         completed: updatedTodo.completed,
-        position: updatedTodo.position
+        position: updatedTodo.position,
       });
       setTodos((prevTodos) =>
         prevTodos.map((todo) =>
           todo.id === id ? { ...updatedTodo, isEditing: false } : todo
         )
       );
-      toast.success("Todo updated successfully!");
+      toast.success("Updated successfully!");
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -125,17 +159,22 @@ const TodoLoader: React.FC = () => {
 
   const handleCancel = (id: number, isFirstEdit: boolean) => {
     if (isFirstEdit) {
-      setTodos(todos.filter(todo => todo.id !== id));
+      setTodos(todos.filter((todo) => todo.id !== id));
     } else {
-      setTodos(todos.map(todo => (todo.id === id ? { ...todo, isEditing: false } : todo)));
+      setTodos(
+        todos.map((todo) =>
+          todo.id === id ? { ...todo, isEditing: false } : todo
+        )
+      );
     }
   };
 
   const handleEditChange = (id: number, isEditing: boolean) => {
-    setTodos(todos.map(todo => (todo.id === id ? { ...todo, isEditing } : todo)));
+    setTodos(
+      todos.map((todo) => (todo.id === id ? { ...todo, isEditing } : todo))
+    );
   };
 
-  
   const handleDragStart = (event: DragStartEvent) => {
     // The id of the element being dragged
     setActiveId(event.active.id);
@@ -152,31 +191,40 @@ const TodoLoader: React.FC = () => {
     }
 
     // Find the active todo in the todos array
-    const activeTodo = todos.find(todo => todo.id === active.id);
+    const activeTodo = todos.find((todo) => todo.id === active.id);
     if (!activeTodo) {
       setActiveId(null);
       return;
     }
 
     // Determine if the over container is the completed grid or the incompleted grid
-    const overContainer = over.id === 'completed-grid' ? true : over.id === 'incompleted-grid' ? false : activeTodo.completed;
+    const overContainer =
+      over.id === "completed-grid"
+        ? true
+        : over.id === "incompleted-grid"
+        ? false
+        : activeTodo.completed;
 
     // If not already in that container, update the todo
     if (activeTodo.completed !== overContainer) {
-      const updatedTodo = { ...activeTodo, completed: overContainer, position: todos.length };
+      const updatedTodo = {
+        ...activeTodo,
+        completed: overContainer,
+        position: todos.length,
+      };
       try {
         await updateTodo({
           id: updatedTodo.id,
           title: updatedTodo.title,
           content: updatedTodo.content,
           completed: updatedTodo.completed,
-          position: updatedTodo.position
+          position: updatedTodo.position,
         });
         setTodos((items) =>
           items.map((todo) => (todo.id === active.id ? updatedTodo : todo))
         );
         if (overContainer) {
-          toast.success("Let's get this done!");
+          toast.success("That's one less thing to worry about!");
         } else {
           toast.success("Let's have another go at it!");
         }
@@ -191,7 +239,9 @@ const TodoLoader: React.FC = () => {
       // If the same container, just update the position of the todos
       const oldIndex = todos.indexOf(activeTodo);
       // Find the index of the todo being dragged over
-      const newIndex = todos.indexOf(todos.find(todo => todo.id === over.id)!);
+      const newIndex = todos.indexOf(
+        todos.find((todo) => todo.id === over.id)!
+      );
       // arrayMove is part of dndkit and does the heavy lifting of moving the todos
       const updatedTodos = arrayMove(todos, oldIndex, newIndex);
       setTodos(updatedTodos);
@@ -203,7 +253,7 @@ const TodoLoader: React.FC = () => {
           title: updatedTodos[i].title,
           content: updatedTodos[i].content,
           completed: updatedTodos[i].completed,
-          position: i + 1
+          position: i + 1,
         });
       }
     }
@@ -223,13 +273,13 @@ const TodoLoader: React.FC = () => {
         delay: 200,
         tolerance: 6,
       },
-    }),
+    })
   );
 
-  const incompletedTodos = todos.filter(todo => !todo.completed);
-  const completedTodos = todos.filter(todo => todo.completed);
+  const incompletedTodos = todos.filter((todo) => !todo.completed);
+  const completedTodos = todos.filter((todo) => todo.completed);
 
-  const activeTodo = todos.find(todo => todo.id === activeId) || null;
+  const activeTodo = todos.find((todo) => todo.id === activeId) || null;
   return (
     <DndContext
       sensors={sensors}
@@ -260,9 +310,7 @@ const TodoLoader: React.FC = () => {
           gridId="completed-grid"
         />
       </Flexbox>
-      <DragOverlay
-        dropAnimation={null}
-      >
+      <DragOverlay dropAnimation={null}>
         {activeTodo ? (
           <Todo
             id={activeTodo.id}
@@ -281,7 +329,13 @@ const TodoLoader: React.FC = () => {
           />
         ) : null}
       </DragOverlay>
-      <button className={style.createButton} onClick={handleCreate} data-testid="new-goal-button">New Goal</button>
+      <button
+        className={style.createButton}
+        onClick={handleCreate}
+        data-testid="new-goal-button"
+      >
+        New Goal
+      </button>
     </DndContext>
   );
 };

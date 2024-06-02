@@ -10,12 +10,12 @@ interface TodoProps {
   id: number;
   title: string;
   content: string;
-  deleteTodo: (id: number) => void;
+  deleteTodo: (id: number) => unknown;
   isFirstEdit?: boolean;
-  onCancel: (id: number, isFirstEdit: boolean) => void;
-  onUpdate: (id: number, newTitle: string, newContent: string, completed: boolean, position: number) => void;
-  onSave: (tempId: number, newTodo: Omit<TodoType, 'id'>) => void;
-  onEditChange: (id: number, isEditing: boolean) => void;
+  onCancel: (id: number, isFirstEdit: boolean) => unknown;
+  onUpdate: (id: number, newTitle: string, newContent: string, completed: boolean, position: number) => unknown;
+  onSave: (tempId: number, newTodo: Omit<TodoType, 'id'>) => unknown;
+  onEditChange: (id: number, isEditing: boolean) => unknown;
   isEditing: boolean;
   allowEditing: boolean;
   completed: boolean;

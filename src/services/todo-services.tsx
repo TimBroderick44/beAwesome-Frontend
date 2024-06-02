@@ -1,11 +1,14 @@
-export const fetchTodos = async (completed: boolean): Promise<any[]> => {
+import { TodoType } from "../types/todo";
+import { CreateTodo } from "../types/createtodo";
+
+export const fetchTodos = async (): Promise<TodoType[]> => {
   try {
-    const response = await fetch(`http://localhost:8080/todos?completed=${completed}`);
+    const response = await fetch(`http://localhost:8080/todos`);
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
-    if (!Array.isArray(data)) {
+    if (!Array.isArray(data)){
       throw new Error('Invalid data format');
     }
     return data;
@@ -18,7 +21,7 @@ export const fetchTodos = async (completed: boolean): Promise<any[]> => {
   }
 };
 
-export const createTodo = async (todo: { title: string; content: string }): Promise<any> => {
+export const createTodo = async (todo: CreateTodo): Promise<TodoType> => {
   try {
     const response = await fetch('http://localhost:8080/todos', {
       method: 'POST',
@@ -44,7 +47,7 @@ export const createTodo = async (todo: { title: string; content: string }): Prom
   }
 };
 
-export const updateTodo = async (todo: { id: number; title: string; content: string; completed: boolean; position: number }): Promise<any> => {
+export const updateTodo = async (todo: TodoType): Promise<TodoType> => {
   try {
     const response = await fetch(`http://localhost:8080/todos/${todo.id}`, {
       method: 'PATCH',
@@ -70,7 +73,7 @@ export const updateTodo = async (todo: { id: number; title: string; content: str
   }
 };  
 
-export const deleteTodo = async (id: number): Promise<any> => {
+export const deleteTodo = async (id: number): Promise<unknown> => {
   try {
     const response = await fetch(`http://localhost:8080/todos/${id}`, {
       method: 'DELETE',

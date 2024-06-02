@@ -29,6 +29,7 @@
           resize: none;
           margin-top: 7px;
           margin-bottom: 10px;
+          scrollbar-color: #000000c4 #f4f4f400 ;
           &::placeholder {
             color: #0000009c;
           }
@@ -55,4 +56,75 @@
             }
           }
         }
+    }
+
+    /* 0 to 450px */
+@media (max-width: 450px) {
+      .form {
+        .input {
+          height: 100px;
+        }
+        .content {
+display: none;
+        }
+        .buttons {
+          margin-top: 10px;
+          .save, .cancel, .clear {
+            font-size: 10px;
+          }
+        }
+      }
+    }
+
+    /* 451 to 741px */
+@media (min-width: 451px) and (max-width: 741px) {
+      .form {
+        .input {
+          height: 100px;
+        }
+        .content {
+        display: none;
+        }
+        .buttons {
+          margin-top: 10px;
+          .save, .cancel, .clear {
+            font-size: 10px;
+          }
+        }
+      }
+    }
+
+    /* 742 to 1100px */
+@media (min-width: 742px) and (max-width: 1200px) {
+      .form {
+        .title{
+          font-size: 36px;
+          margin-bottom: 50px;
+        }
+        .content {
+        display: none;
+        }
+        .buttons {
+          .save, .cancel, .clear {
+            margin-top: 70px;
+            font-size: 10px;
+          }
+        }
+      }
+    }
+
+/* 1101 to 2500px */
+@media (min-width: 1201px) and (max-width: 1900px) {
+      .form {
+        .content {
+          font-size: 16px;
+          height: 80px;
+          margin-bottom: 5px;
+        }
+        .buttons {
+          .save, .cancel, .clear {
+            font-size: 12px;
+          }
+        }
+      }
     }

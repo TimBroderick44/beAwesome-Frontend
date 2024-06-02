@@ -43,3 +43,60 @@
     font-style: italic;
   }
 }
+
+/* 0 to 450px */
+@media (max-width: 450px) {
+  .container {
+    height: 60vh;
+    width: 95vw;
+    .heading {
+      font-size: 2rem;
+    }
+    .img {
+      width: 90%;
+      height: 70%;
+      min-width: 300px;
+      max-width: 500px;
+    }
+    .text {
+      font-size: 1rem;
+    }
+  }
+}
+
+/* 451 to 741px */
+@media (min-width: 451px) and (max-width: 741px) {
+  .container {
+    height: 60vh;
+    .heading {
+      font-size: 2.5rem;
+    }
+    .img {
+      width: 90%;
+      height: 70%;
+      min-width: 300px;
+      max-width: 500px;
+    }
+    .text {
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (min-width: 800px) {
+  .container {
+    height: 80vh;
+    .heading {
+      font-size: 3rem;
+    }
+    .img {
+      width: 90%;
+      height: 70%;
+      min-width: 300px;
+      max-width: 500px;
+    }
+    .text {
+      font-size: 1rem;
+    }
+  }
+}

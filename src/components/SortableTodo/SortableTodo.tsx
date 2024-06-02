@@ -6,11 +6,11 @@ import { TodoType } from '../../types/todo';
 
 const SortableTodo: React.FC<{
   todo: TodoType;
-  deleteTodo: (id: number) => void;
-  onCancel: (id: number, isFirstEdit: boolean) => void;
-  onUpdate: (id: number, newTitle: string, newContent: string, completed: boolean, position: number) => void;
-  onSave: (tempId: number, newTodo: Omit<TodoType, 'id'>) => void;
-  onEditChange: (id: number, isEditing: boolean) => void;
+  deleteTodo: (id: number) => unknown;
+  onCancel: (id: number, isFirstEdit: boolean) => unknown;
+  onUpdate: (id: number, newTitle: string, newContent: string, completed: boolean, position: number) => unknown;
+  onSave: (tempId: number, newTodo: Omit<TodoType, 'id'>) => unknown;
+  onEditChange: (id: number, isEditing: boolean) => unknown;
   allowEditing: boolean;
 }> = ({ todo, deleteTodo, onCancel, onUpdate, onSave, onEditChange, allowEditing }) => {
   const {

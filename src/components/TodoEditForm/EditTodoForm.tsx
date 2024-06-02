@@ -4,8 +4,8 @@ import style from "./EditTodoForm.module.scss";
 interface EditTodoFormProps {
   initialTitle: string;
   initialContent: string;
-  onSave: (title: string, content: string) => void;
-  onCancel: () => void;
+  onSave: (title: string, content: string) => unknown;
+  onCancel: () => unknown;
   dataTestId?: string;
 }
 

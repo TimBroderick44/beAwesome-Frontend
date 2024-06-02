@@ -1,43 +1,77 @@
+import React from 'react';
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
+import { ToastContainer, toast } from 'react-toastify';
+import '@testing-library/jest-dom';
 import TodoLoader from './TodoLoader';
 import * as todoServices from '../../services/todo-services';
-import { vi } from 'vitest';
+import { test, vi } from 'vitest';
 import { TodoType } from '../../types/todo';
 
-// Mock the todo services using Vitest
 vi.mock('../../services/todo-services');
+vi.mock('react-toastify', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-toastify')>();
+  return {
+    ...actual,
+    toast: {
+      success: vi.fn(),
+      error: vi.fn(),
+    },
+  };
+});
 
-const mockIncompletedTodos = [
+const mockTodos = [
   { id: 1, title: 'Todo 1', content: 'Content 1', completed: false, position: 1 },
-];
-
-const mockCompletedTodos = [
   { id: 2, title: 'Todo 2', content: 'Content 2', completed: true, position: 2 },
 ];
 
 beforeEach(() => {
-  (todoServices.fetchTodos as any).mockImplementation((completed: boolean) => {
-    return completed ? Promise.resolve(mockCompletedTodos) : Promise.resolve(mockIncompletedTodos);
-  });
-  (todoServices.createTodo as any).mockImplementation(async (todo: TodoType) => ({ ...todo, id: Date.now() }));
-  (todoServices.updateTodo as any).mockImplementation(async (todo: TodoType) => todo);
+  (todoServices.fetchTodos as any).mockResolvedValue(mockTodos);
+  (todoServices.createTodo as any).mockImplementation(async (todo) => ({ ...todo, id: Date.now() }));
+  (todoServices.updateTodo as any).mockImplementation(async (todo) => todo);
   (todoServices.deleteTodo as any).mockResolvedValueOnce({});
+  vi.clearAllMocks();
 });
 
-test('loads and displays complete and incomplete todos', async () => {
-  render(<TodoLoader />);
+test('loads and displays todos', async () => {
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
 
   await waitFor(() => {
-    expect(screen.getByText(/Todo 1/i)).toBeInTheDocument();
-    expect(screen.getByText(/Todo 2/i)).toBeInTheDocument();
+    expect(screen.getByText('What I Need to Do:')).toBeInTheDocument();
+    expect(screen.getByText('Done & Dusted!')).toBeInTheDocument();
+    expect(screen.getByText('Todo 1')).toBeInTheDocument();
+    expect(screen.getByText('Todo 2')).toBeInTheDocument();
+  });
+});
+
+test('handles fetchTodos error', async () => {
+  (todoServices.fetchTodos as any).mockRejectedValueOnce(new Error('Fetch error'));
+
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
+
+  await waitFor(() => {
+    expect(toast.error).toHaveBeenCalledWith('Fetch error');
   });
 });
 
 test('creates a new todo', async () => {
-  render(<TodoLoader />);
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
 
-  const newGoalButton = screen.getByTestId('new-goal-button');
-  fireEvent.click(newGoalButton);
+  fireEvent.click(screen.getByTestId('new-goal-button'));
 
   const titleInput = screen.getByTestId('title-input');
   const contentInput = screen.getByTestId('content-input');
@@ -45,44 +79,101 @@ test('creates a new todo', async () => {
   fireEvent.change(titleInput, { target: { value: 'New Todo' } });
   fireEvent.change(contentInput, { target: { value: 'New Content' } });
 
-  const saveButton = screen.getByTestId('save-button');
-  fireEvent.click(saveButton);
+  fireEvent.click(screen.getByTestId('save-button'));
 
   await waitFor(() => {
-    expect(screen.getByText(/New Todo/i)).toBeInTheDocument();
-    expect(screen.getByText(/New Content/i)).toBeInTheDocument();
+    expect(screen.getByText('New Todo')).toBeInTheDocument();
+  });
+  await waitFor(() => {
+    expect(toast.success).toHaveBeenCalledWith("Let's get it done!");
   });
 });
 
-test('updates an existing todo', async () => {
-  render(<TodoLoader />);
+test('handles createTodo error', async () => {
+  (todoServices.createTodo as any).mockRejectedValueOnce(new Error('Create error'));
 
-  await waitFor(() => {
-    expect(screen.getByText(/Todo 1/i)).toBeInTheDocument();
-  });
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
 
-  const editButton = screen.getByTestId('edit-todo-1');
-  fireEvent.click(editButton);
+  fireEvent.click(screen.getByTestId('new-goal-button'));
 
   const titleInput = screen.getByTestId('title-input');
-  fireEvent.change(titleInput, { target: { value: '' } });
+  const contentInput = screen.getByTestId('content-input');
+
+  fireEvent.change(titleInput, { target: { value: 'New Todo' } });
+  fireEvent.change(contentInput, { target: { value: 'New Content' } });
+
+  fireEvent.click(screen.getByTestId('save-button'));
+
+  await waitFor(() => {
+    expect(toast.error).toHaveBeenCalledWith('Create error');
+  });
+});
+
+test('updates a todo', async () => {
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
+
+  await waitFor(() => screen.getByText('Todo 1'));
+
+  fireEvent.click(screen.getByTestId('edit-todo-1'));
+
+  const titleInput = screen.getByTestId('title-input');
   fireEvent.change(titleInput, { target: { value: 'Updated Todo' } });
 
   const saveButton = screen.getByTestId('save-button');
   fireEvent.click(saveButton);
 
   await waitFor(() => {
-    expect(screen.getByText(/Updated Todo/i)).toBeInTheDocument();
+    expect(screen.getByText('Updated Todo')).toBeInTheDocument();
+  });
+  await waitFor(() => {
+    expect(toast.success).toHaveBeenCalledWith('Updated successfully!');
   });
 });
 
+test('handles updateTodo error', async () => {
+  (todoServices.updateTodo as any).mockRejectedValueOnce(new Error('Update error'));
 
-test('deletes a todo', async () => {
-  render(<TodoLoader />);
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
+
+  await waitFor(() => screen.getByText('Todo 1'));
+
+  fireEvent.click(screen.getByTestId('edit-todo-1'));
+
+  const titleInput = screen.getByTestId('title-input');
+  fireEvent.change(titleInput, { target: { value: 'Updated Todo' } });
+
+  const saveButton = screen.getByTestId('save-button');
+  fireEvent.click(saveButton);
 
   await waitFor(() => {
-    expect(screen.getByText(/Todo 1/i)).toBeInTheDocument();
+    expect(toast.error).toHaveBeenCalledWith('Update error');
   });
+});
+
+test('deletes a todo', async () => {
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
+
+  await waitFor(() => screen.getByText('Todo 1'));
 
   const todoElement = screen.getByTestId('todo-1');
   const deleteButton = within(todoElement).getByTestId('delete-todo-1');
@@ -90,20 +181,46 @@ test('deletes a todo', async () => {
   fireEvent.click(deleteButton);
 
   await waitFor(() => {
-    expect(screen.queryByText(/Todo 1/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('Todo 1')).not.toBeInTheDocument();
+  });
+  await waitFor(() => {
+    expect(toast.success).toHaveBeenCalledWith('Out of sight, out of mind');
   });
 });
 
+test('handles deleteTodo error', async () => {
+  (todoServices.deleteTodo as any).mockRejectedValueOnce(new Error('Delete error'));
 
-test('clears the form fields when clear button is clicked', async () => {
-  render(<TodoLoader />);
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
+
+  await waitFor(() => screen.getByText('Todo 1'));
+
+  const todoElement = screen.getByTestId('todo-1');
+  const deleteButton = within(todoElement).getByTestId('delete-todo-1');
+
+  fireEvent.click(deleteButton);
 
   await waitFor(() => {
-    expect(screen.getByText(/Todo 1/i)).toBeInTheDocument();
+    expect(toast.error).toHaveBeenCalledWith('Delete error');
   });
+});
 
-  const editButton = screen.getByTestId('edit-todo-1');
-  fireEvent.click(editButton);
+test('clears the form fields when clear button is clicked', async () => {
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
+
+  await waitFor(() => screen.getByText('Todo 1'));
+
+  fireEvent.click(screen.getByTestId('edit-todo-1'));
 
   const titleInput = screen.getByTestId('title-input');
   const contentInput = screen.getByTestId('content-input');
@@ -122,14 +239,19 @@ test('clears the form fields when clear button is clicked', async () => {
 });
 
 test('moves todo from incomplete to complete', async () => {
-  render(<TodoLoader />);
+  render(
+    <>
+      <ToastContainer />
+      <TodoLoader />
+    </>
+  );
 
   await waitFor(() => {
-    expect(screen.getByText(/Todo 1/i)).toBeInTheDocument();
-    expect(screen.getByText(/Done & Dusted!/i)).toBeInTheDocument();
+    expect(screen.getByText('Todo 1')).toBeInTheDocument();
+    expect(screen.getByText('Done & Dusted!')).toBeInTheDocument();
   });
 
-  const todoItem = screen.getByText(/Todo 1/i);
+  const todoItem = screen.getByText('Todo 1');
 
   fireEvent.dragStart(todoItem);
 
@@ -138,6 +260,6 @@ test('moves todo from incomplete to complete', async () => {
   fireEvent.drop(completedGrid);
 
   await waitFor(() => {
-    expect(screen.getByText(/Todo 1/i)).toBeInTheDocument();
+    expect(screen.getByText('Todo 1')).toBeInTheDocument();
   });
 });

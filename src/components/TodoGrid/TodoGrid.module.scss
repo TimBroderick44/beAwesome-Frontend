@@ -15,6 +15,7 @@
 
 .posts{
     display: grid;
+    place-items: center;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
 }
@@ -45,3 +46,94 @@
     padding: 0 20px 0 20px; 
 }
 
+/* 0 to 450px */
+@media (max-width: 450px) {
+    .todosContainer {
+        width: 45vw;
+        height: 80vh;
+        border-top: 10px solid rgba(73, 55, 6, 0.897) ;
+        border-right: 10px solid rgba(73, 55, 6, 0.856) ;
+        border-bottom: 10px solid rgba(73, 55, 6, 0.856) ;
+        border-left: 10px solid rgba(73, 55, 6, 0.897) ;
+        .posts {
+            grid-template-columns: repeat(1, 1fr);
+            grid-template-rows: repeat(1, 1fr);
+        }
+    }
+    .heading {
+        font-size: 22px;
+    }
+    .noPosts {
+        font-size: 26px;
+        grid-column: 1 / span 3; 
+    }
+  }
+  
+  /* 451 to 741px */
+  @media (min-width: 451px) and (max-width: 741px) {
+    .todosContainer {
+        width: 46vw;
+        height: 80vh;
+        border-top: 10px solid rgba(73, 55, 6, 0.897) ;
+        border-right: 10px solid rgba(73, 55, 6, 0.856) ;
+        border-bottom: 10px solid rgba(73, 55, 6, 0.856) ;
+        border-left: 10px solid rgba(73, 55, 6, 0.897) ;
+        .posts {
+            grid-template-columns: repeat(1, 1fr);
+            grid-template-rows: repeat(1, 1fr);
+        }
+    }
+    .heading {
+        font-size: 40px;
+    }
+    .noPosts {
+        font-size: 32px;
+    }
+  }
+  
+  /* 742 to 1100px */
+  @media (min-width: 742px) and (max-width: 1200px) {
+    .todosContainer {
+        width: 45vw;
+        height: 75vh;
+        border-top: 10px solid rgba(73, 55, 6, 0.897) ;
+        border-right: 10px solid rgba(73, 55, 6, 0.856) ;
+        border-bottom: 10px solid rgba(73, 55, 6, 0.856) ;
+        border-left: 10px solid rgba(73, 55, 6, 0.897) ;
+        .posts {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+    }
+    .heading {
+        font-size: 50px;
+    }
+    .noPosts {
+        font-size: 40px;
+    }
+  }
+  
+  /* 1101 to 2500px */
+  @media (min-width: 1201px) and (max-width: 1900px) {
+    .todosContainer {
+        margin-top: 30px;
+        width: 48vw;
+        height: 75vh;
+        border-top: 20px solid rgba(73, 55, 6, 0.897) ;
+        border-right: 20px solid rgba(73, 55, 6, 0.856) ;
+        border-bottom: 20px solid rgba(73, 55, 6, 0.856) ;
+        border-left: 20px solid rgba(73, 55, 6, 0.897) ;
+        .posts {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(1, 1fr);
+        }
+    }
+    .heading {
+        font-size: 50px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .noPosts {
+        font-size: 60px;
+    }
+  }

@@ -7,6 +7,8 @@
   font-size: 32px;
   margin-right: 800px;
   z-index: 1;
+  margin-bottom: 0;
+
   cursor: pointer;
   &:hover {
     color: #fff;
@@ -18,4 +20,35 @@
     color: #c2c3c1;
     text-decoration: solid;
 }
+}
+
+@media (max-width: 450px) {
+  .createButton {
+    margin-right: 0;
+    font-size: 18px;
+  }
+}
+
+/* 451 to 741px */
+@media (min-width: 451px) and (max-width: 741px) {
+  .createButton {
+    margin-right: 0;
+    font-size: 24px;
+  }
+}
+
+/* 742 to 1100px */
+@media (min-width: 742px) and (max-width: 1200px) {
+  .createButton {
+    margin-right: 0;
+    font-size: 28px;
+  }
+}
+
+/* 1101 to 2500px */
+@media (min-width: 1201px) and (max-width: 1900px) {
+  .createButton {
+    margin-right: 0;
+    font-size: 28px;
+  }
 }
